@@ -1,0 +1,8 @@
+.venv/
+.chroma/
+server/
+scripts/
+docs/
+__pycache__/
+ui/node_modules/
+ui/dist/

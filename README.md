@@ -49,6 +49,10 @@ AI-powered test automation blueprint.
   - [Chapter 09: LangFlow](#chapter-09-langflow)
     - [The bug triage flows](#the-bug-triage-flows)
     - [Calling a flow from your own UI](#calling-a-flow-from-your-own-ui)
+  - [Chapter 10: RAG Basics](#chapter-10-rag-basics)
+    - [The five stages](#the-five-stages)
+    - [The step everyone skips](#the-step-everyone-skips)
+    - [Running it two ways](#running-it-two-ways)
 - [License](#license)
 
 ## Overview
@@ -1397,6 +1401,110 @@ flowchart LR
 > Remember the flow's `APIRequest` node stores a Jira `Authorization: Basic` header, so a
 > public tunnel means anyone holding the API key can read your Jira through it. The flow
 > JSONs in this repo ship that header redacted to a placeholder.
+
+### Chapter 10: RAG Basics
+
+**Concept:** RAG (Retrieval Augmented Generation) is how you get an LLM to answer from
+*your* documents instead of its training data: split the document into chunks, turn each
+chunk into a vector, and at question time retrieve the closest chunks and paste them into
+the prompt.
+
+**Why:** fine-tuning a model on a 7-page PRD is absurd, and pasting the whole document
+into every prompt gets expensive and hits context limits. Retrieval sends only the 3
+paragraphs that matter.
+
+`01_RAG_Explorer` is a RAG pipeline you can *watch happen*. Every stage is on screen: the
+raw extraction, the repair, the chunks, the 768-number vectors, the similarity scores, and
+the verbatim prompt that reaches the model.
+
+**Live demo: [rag-explorer-tta.vercel.app](https://rag-explorer-tta.vercel.app)**
+
+```bash
+cd chapter_10_RAG_Basics/01_RAG_Explorer
+./run.sh            # http://localhost:5190
+```
+
+![RAG Explorer](chapter_10_RAG_Basics/01_RAG_Explorer/docs/01-ingest.png)
+
+#### The five stages
+
+```mermaid
+flowchart LR
+    PDF["PDF<br/>7 pages"] --> EX["Extract<br/>pypdf"]
+    EX --> NM["Normalise<br/>repair the text"]
+    NM --> CH["Chunk<br/>180w / 40 overlap"]
+    CH --> EM["Embed<br/>nomic · 768d"]
+    EM --> ST["Store<br/>Chroma · cosine"]
+    Q["Question"] --> QE["Embed the query"]
+    QE --> SR{"Cosine<br/>similarity"}
+    ST --> SR
+    SR --> T3["Top 3 chunks"]
+    T3 --> LLM["gpt-oss-120b<br/>answer from context only"]
+
+    classDef src fill:#57606a,stroke:#24292f,color:#fff
+    classDef ai fill:#1f6feb,stroke:#0b3d91,color:#fff
+    classDef gate fill:#bf8700,stroke:#7a5600,color:#fff
+    classDef out fill:#2da44e,stroke:#0f5323,color:#fff
+    class PDF,Q src
+    class EM,QE,LLM ai
+    class EX,NM,CH,SR gate
+    class ST,T3 out
+```
+
+Retrieval is the whole trick, and it is just arithmetic:
+
+```js
+// Both vectors are unit-normalised, so the dot product IS the cosine similarity.
+const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++) s += a[i] * b[i]; return s; };
+
+const top3 = chunks
+  .map((c) => ({ ...c, similarity: dot(queryVector, c.vector) }))
+  .sort((a, b) => b.similarity - a.similarity)
+  .slice(0, 3);
+
+// similarity = 1 - cosine_distance. No keyword matching happens anywhere:
+// "how do users sign in" retrieves the chunk about *authentication*.
+```
+
+#### The step everyone skips
+
+The bundled PRD was exported from Google Docs, and pypdf returns **one word per line**:
+
+```
+Product\n \nRequirements\n \nDocument:\n \nVWO\n \nLogin\n \nDashboard
+```
+
+Chunk that as-is and every chunk is a column of disconnected words, which embeds into
+noise, which makes retrieval useless. The normaliser detects the pattern (more than 60% of
+lines holding a single token) and rejoins the text, stripping 2,432 characters of junk from
+this file. The UI shows raw and normalised side by side, because this is the step most
+likely to quietly ruin a RAG demo and nobody ever shows it.
+
+#### Running it two ways
+
+The same UI detects where it is and switches engines. Everything on screen is genuinely
+computed in both; only the model and its location change.
+
+| | Local (`./run.sh`) | Hosted (Vercel) |
+|---|---|---|
+| Extract + chunk | pypdf, live, sliders re-run it | pre-computed at build time |
+| Embeddings | `nomic-embed-text`, 768d, **Ollama** | MiniLM, 384d, **in the browser** |
+| Vector search | ChromaDB | cosine in JavaScript |
+| Answer | `openai/gpt-oss-120b` on Groq | same, via a rate-limited function |
+
+Vercel cannot reach a local Ollama, and 79 vectors do not need a vector database, so the
+hosted build bakes the chunk vectors at build time and embeds the query client-side.
+
+**Q&A - why use this?**
+- **Q: Where does my document actually go?** A: Locally, nowhere. Extraction, embedding and the Chroma index all run on your machine, so you can demo the entire ingest half with nothing on the wire. Only the 3 retrieved chunks reach Groq, and only when you use the Chat tab. For a confidential document that distinction is the whole argument for local embeddings.
+- **Q: Why does 60% similarity count as a good match?** A: Because scores are relative, not absolute. Nomic on prose rarely passes ~0.7 for a short question against a 180-word chunk. Judge hits by their ranking against each other, never against a fixed threshold, and never show students a bare percentage without that caveat.
+- **Q: What's the gotcha?** A: Chunk size is a real trade-off with no right answer. At 60 words you get sharper scores but answers truncated mid-thought; at 400 each chunk holds full context but retrieval blurs because one vector now averages too many ideas. The slider exists so you can watch it break in both directions.
+
+> **Grounding is a prompt, not a property of the model.** Ask the explorer something the
+> PRD does not cover ("what is the pricing?") and it answers *"the provided document
+> excerpts do not contain any information about pricing"* instead of inventing a number.
+> That comes from one line in the system prompt in `server/app.py`, not from the model
+> being careful. Delete the line and it will happily make something up.
 
 ## License
 
