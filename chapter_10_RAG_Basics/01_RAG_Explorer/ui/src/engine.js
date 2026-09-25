@@ -29,7 +29,10 @@ export async function detectMode() {
   // that cannot exist there (and never logs a 404 in the student's console).
   if (import.meta.env.VITE_STATIC) return { mode: 'static', health: null };
   try {
-    const r = await fetch('/api/health', { signal: AbortSignal.timeout(1500) });
+    // Health pings Ollama server-side, so it is not instant. Too tight a budget here
+    // silently misclassifies a working local backend as "hosted" and drops the UI into
+    // static mode, which is a confusing failure to debug.
+    const r = await fetch('/api/health', { signal: AbortSignal.timeout(8000) });
     if (r.ok) return { mode: 'live', health: await r.json() };
   } catch {
     /* no backend: fall through to the hosted path */
