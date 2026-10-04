@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.qdrant/
+ui/node_modules/
+ui/dist/

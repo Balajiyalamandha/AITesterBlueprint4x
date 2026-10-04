@@ -1,3 +1,6 @@
+
+
+
 """RAG Explorer backend.
 
 One file on purpose: the whole point is that you can read the entire RAG pipeline
@@ -31,9 +34,7 @@ from pypdf import PdfReader
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
-# 127.0.0.1 rather than "localhost": on Windows the name resolves to ::1 first,
-# which Ollama does not listen on, so every call eats a ~2s IPv6 timeout first.
-OLLAMA = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434")
+OLLAMA = os.getenv("OLLAMA_URL", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")
 GROQ_KEY = os.getenv("GROQ_API_KEY", "")

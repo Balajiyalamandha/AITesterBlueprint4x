@@ -1,0 +1,12 @@
+id,title,traces_to,priority,preconditions,steps,expected
+TC-LOGIN-001,Reject empty email,FR-01,P1,Login page loaded,Submit with email blank,Inline error 'Email is required' under email field
+TC-LOGIN-002,Reject malformed email,FR-01,P1,Login page loaded,Enter 'user@domain' and submit,Inline error 'Enter a valid email address' under email field
+TC-LOGIN-003,Trim surrounding whitespace,FR-01,P2,Login page loaded,Enter '  user@domain.com  ' and a valid password,Whitespace trimmed and login proceeds
+TC-LOGIN-004,Accept uppercase email,FR-01,P2,Login page loaded,Enter 'USER@DOMAIN.COM',Login proceeds case-insensitively
+TC-LOGIN-005,Legacy short password is accepted at login,FR-02,P1,Account with 8-char password exists,Enter the 8-char password and submit,Login succeeds because the form must not enforce registration rules
+TC-LOGIN-006,Invalid credentials render inline,FR-03,P1,Account exists,Enter correct email and wrong password,Error appears inline under password field with aria-live assertive
+TC-LOGIN-007,Invalid credentials must NOT use top banner,FR-03,P1,Account exists,Enter correct email and wrong password,No top-of-form banner is shown; error is inline only
+TC-LOGIN-008,Screen reader announcement,FR-03,P1,Screen reader active,Trigger an invalid credentials error,Error string is announced assertively exactly once
+TC-LOGIN-009,SSO tenant replaces password field,FR-04,P1,Email domain maps to SSO tenant,Enter an SSO tenant email and blur,Password field replaced by 'Continue with SSO'
+TC-LOGIN-010,Lockout after five failures,FR-05,P1,Account exists,Submit a wrong password five times,Account locks for 15 minutes with a lockout message
+TC-LOGIN-011,Captcha failure is an auth failure,FR-06,P1,Captcha token invalid,Submit with a valid email and password,Captcha failure message shown and no success redirect

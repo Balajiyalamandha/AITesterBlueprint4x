@@ -1,0 +1,36 @@
+{
+  "key": "VWO-125",
+  "type": "Bug",
+  "status": "In Progress",
+  "priority": "P1",
+  "severity": "S2 - Major",
+  "summary": "Invalid credentials error renders in the top banner instead of inline under the password field",
+  "affects_version": "build 1421",
+  "components": ["login-ui"],
+  "reporter": "dana.whitfield",
+  "assignee": "sam.okafor",
+  "created": "2026-09-24T10:12:00Z",
+  "traces_to": ["FR-03", "SR-05"],
+  "description": "On a failed email/password login the error message appears in the generic top-of-form banner. PRD FR-03 requires the error to render inline beneath the offending field and to be announced via an assertive live region. The banner path is the fallback and should only be used for non-field errors such as network failure.",
+  "steps_to_reproduce": [
+    "Open https://qa.vwo.com/login on build 1421",
+    "Enter a valid email for an existing account",
+    "Enter an incorrect password",
+    "Click Sign in"
+  ],
+  "expected_result": "Inline error 'Email or password is incorrect' under the password field, announced assertively",
+  "actual_result": "Top-of-form banner shows the message; no inline error; screen reader announces nothing",
+  "related_test_cases": ["TC-LOGIN-006", "TC-LOGIN-007", "TC-LOGIN-008"],
+  "comments": [
+    {
+      "author": "sam.okafor",
+      "at": "2026-09-24T13:40:00Z",
+      "body": "Root cause is in the login view: the catch block routes every 401 to the banner handler before the reason-code map is consulted. Fix is to key the banner off `reason` and default unknown reasons to the banner only."
+    },
+    {
+      "author": "dana.whitfield",
+      "at": "2026-09-25T09:05:00Z",
+      "body": "Adding a regression assertion that the banner element is empty for invalid_credentials. Fails on 1421, should pass once the map is used."
+    }
+  ]
+}

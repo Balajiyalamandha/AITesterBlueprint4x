@@ -1,0 +1,101 @@
+﻿Test Case ID,Summary,Type,Priority,Precondition,Test Steps,Test Data,Expected Result
+LOGIN-001,[LOGIN] Verify Wingify login URL is accessible,Positive,High,Login page is accessible,Navigate to https://app.wingify.com/#/login,Valid URL,Login page loads successfully
+LOGIN-002,[LOGIN] Verify HTTPS is used for login URL,Positive,High,Login page is accessible,Open the Wingify login URL and inspect browser address bar,HTTPS URL,Connection uses HTTPS
+LOGIN-003,[LOGIN] Verify Wingify logo is displayed,Positive,Low,Login page loaded,Observe the login page,N/A,Wingify logo is visible
+LOGIN-004,[LOGIN] Verify Email Address field is displayed,Positive,High,Login page loaded,Observe login form,N/A,Email field is visible
+LOGIN-005,[LOGIN] Verify Password field is displayed,Positive,High,Login page loaded,Observe login form,N/A,Password field is visible
+LOGIN-006,[LOGIN] Verify Sign In button is displayed,Positive,High,Login page loaded,Observe login form,N/A,Sign In button is visible
+LOGIN-007,[LOGIN] Verify Forgot Password option is displayed,Positive,High,Login page loaded,Observe login form,N/A,Forgot Password link is visible
+LOGIN-008,[LOGIN] Verify Remember Me checkbox is displayed,Positive,Medium,Login page loaded,Observe login form,N/A,Remember Me checkbox is visible
+LOGIN-009,[LOGIN] Verify Google Sign-In option is displayed,Positive,Medium,Login page loaded,Observe login form,N/A,Google Sign-In option is visible
+LOGIN-010,[LOGIN] Verify SSO login option is displayed,Positive,Medium,Login page loaded,Observe login form,N/A,SSO option is visible
+LOGIN-011,[LOGIN] Verify Passkey login option is displayed,Positive,Medium,Login page loaded,Observe login form,N/A,Passkey option is visible
+LOGIN-012,[LOGIN] Verify Start Free Trial option is displayed,Positive,Low,Login page loaded,Observe login page,N/A,Start Free Trial option is visible
+LOGIN-013,[LOGIN] Verify Privacy Policy link is displayed,Positive,Low,Login page loaded,Observe footer/login page,N/A,Privacy Policy link is visible
+LOGIN-014,[LOGIN] Verify Terms link is displayed,Positive,Low,Login page loaded,Observe footer/login page,N/A,Terms link is visible
+LOGIN-015,[LOGIN] Verify page loads without blocking JavaScript errors,Positive,High,Browser developer tools available,Open login page and inspect Console,N/A,No blocking JavaScript errors are present
+LOGIN-016,[LOGIN] Verify browser page title,Positive,Medium,Login page accessible,Open login page and inspect browser title,N/A,Expected login page title is displayed
+LOGIN-017,[LOGIN] Verify keyboard tab order,Positive,Medium,Login page loaded,Use Tab key through login controls,N/A,Focus follows a logical order
+LOGIN-018,[LOGIN] Verify field labels/placeholders,Positive,Medium,Login page loaded,Inspect Email and Password fields,N/A,Correct labels/placeholders are displayed
+LOGIN-019,[LOGIN] Verify Sign In with blank fields,Negative,High,Login page loaded,Leave Email and Password blank and click Sign In,Blank email; blank password,Login is prevented and validation is displayed
+LOGIN-020,[LOGIN] Verify browser refresh on login page,Positive,Medium,Login page loaded,Refresh the browser,N/A,Login page reloads without errors
+LOGIN-021,[LOGIN] Verify valid registered email is accepted,Positive,High,Login page loaded,Enter a valid registered email,valid_registered_email,Email is accepted
+LOGIN-022,[LOGIN] Verify email with uppercase characters,Positive,Medium,Login page loaded,Enter a valid email containing uppercase characters,USER@EXAMPLE.COM,Email is handled correctly
+LOGIN-023,[LOGIN] Verify lowercase email,Positive,Medium,Login page loaded,Enter a valid lowercase email,user@example.com,Email is accepted
+LOGIN-024,[LOGIN] Verify email containing numbers,Positive,Medium,Login page loaded,Enter valid email containing numbers,user123@example.com,Email is accepted
+LOGIN-025,[LOGIN] Verify email containing dot,Positive,Medium,Login page loaded,Enter valid email containing dot,first.last@example.com,Email is accepted
+LOGIN-026,[LOGIN] Verify email with plus alias,Positive,Medium,Login page loaded,Enter supported plus-alias email,user+test@example.com,Application handles supported format correctly
+LOGIN-027,[LOGIN] Verify blank email with valid password,Negative,High,Login page loaded,"Leave email blank, enter valid password, click Sign In",Blank email; valid password,Email validation is displayed
+LOGIN-028,[LOGIN] Verify valid email with blank password,Negative,High,Login page loaded,"Enter valid email, leave password blank, click Sign In",Valid email; blank password,Password validation is displayed
+LOGIN-029,[LOGIN] Verify both email and password blank,Negative,High,Login page loaded,Leave both fields blank and click Sign In,Blank email; blank password,Login is prevented and validation is displayed
+LOGIN-030,[LOGIN] Verify email without @,Negative,High,Login page loaded,Enter email without @ and submit,userexample.com,Invalid email validation is displayed
+LOGIN-031,[LOGIN] Verify email without domain,Negative,High,Login page loaded,Enter email without domain and submit,user@,Invalid email validation is displayed
+LOGIN-032,[LOGIN] Verify email without username,Negative,High,Login page loaded,Enter email without username and submit,@example.com,Invalid email validation is displayed
+LOGIN-033,[LOGIN] Verify email with multiple @ characters,Negative,High,Login page loaded,Enter email with multiple @ characters,user@@example.com,Invalid email is rejected
+LOGIN-034,[LOGIN] Verify email containing spaces,Negative,Medium,Login page loaded,Enter an email containing spaces and submit,user name@example.com,Invalid email is rejected or handled according to specification
+LOGIN-035,[LOGIN] Verify email with leading spaces,Negative,Medium,Login page loaded,Enter valid email with leading spaces,  user@example.com,Application handles spaces according to specification
+LOGIN-036,[LOGIN] Verify email with trailing spaces,Negative,Medium,Login page loaded,Enter valid email with trailing spaces,user@example.com  ,Application handles spaces according to specification
+LOGIN-037,[LOGIN] Verify email with unsupported special characters,Negative,Medium,Login page loaded,Enter malformed email with special characters,user<>@example.com,Invalid email is rejected
+LOGIN-038,[LOGIN] Verify extremely long email,Negative,Medium,Login page loaded,Enter email exceeding supported length,Overlength email,Input is safely validated/rejected
+LOGIN-039,[LOGIN] Verify paste of invalid email,Negative,Medium,Login page loaded,Paste malformed email and submit,invalid-email,Invalid email is validated
+LOGIN-040,[LOGIN] Verify paste of valid email,Positive,Low,Login page loaded,Paste valid email into Email field,user@example.com,Valid email is accepted
+LOGIN-041,[LOGIN] Verify valid password,Positive,High,Login page loaded,Enter valid password,valid_password,Password is accepted
+LOGIN-042,[LOGIN] Verify incorrect password,Negative,High,Login page loaded,Enter valid email and incorrect password,incorrect_password,Authentication fails
+LOGIN-043,[LOGIN] Verify blank password,Negative,High,Login page loaded,Leave password blank and submit,Blank password,Password validation is displayed
+LOGIN-044,[LOGIN] Verify password containing spaces,Negative,Medium,Login page loaded,Enter password containing spaces,password with spaces,Behavior matches password policy
+LOGIN-045,[LOGIN] Verify very short password,Negative,Medium,Login page loaded,Enter password shorter than supported policy,short,Invalid password is rejected if policy applies
+LOGIN-046,[LOGIN] Verify very long password,Negative,Medium,Login page loaded,Enter an excessively long password,Overlength password,Application handles input safely
+LOGIN-047,[LOGIN] Verify password with uppercase characters,Positive,Medium,Login page loaded,Enter password containing uppercase characters,PasswordABC,Password is processed correctly
+LOGIN-048,[LOGIN] Verify password with lowercase characters,Positive,Medium,Login page loaded,Enter password containing lowercase characters,passwordabc,Password is processed correctly
+LOGIN-049,[LOGIN] Verify password with numbers,Positive,Medium,Login page loaded,Enter password containing numbers,Password123,Password is processed correctly
+LOGIN-050,[LOGIN] Verify password with special characters,Positive,Medium,Login page loaded,Enter password containing special characters,Password@123,Password is processed correctly
+LOGIN-051,[LOGIN] Verify password is masked,Positive,High,Login page loaded,Type a password into Password field,valid_password,Password characters are masked
+LOGIN-052,[LOGIN] Verify password copy behavior,Negative,Medium,Login page loaded,Select/copy password from Password field,valid_password,Copy behavior follows security requirements
+LOGIN-053,[LOGIN] Verify password paste behavior,Positive,Medium,Login page loaded,Paste a valid password,valid_password,Password is accepted if paste is supported
+LOGIN-054,[LOGIN] Verify password is not displayed in plain text,Positive,High,Login page loaded,Enter password and inspect field,valid_password,Password remains masked
+LOGIN-055,[LOGIN] Verify repeated incorrect password attempts,Negative,High,Registered account available,Submit incorrect password repeatedly,Valid email; incorrect password,Configured authentication protection is triggered
+LOGIN-056,[LOGIN] Verify expired password login,Negative,High,Account with expired password,Login using expired password,Expired password,Authentication is rejected or password-change flow is shown
+LOGIN-057,[LOGIN] Verify login after password reset,Positive,High,Password has been reset,Login using new password,New password,User authenticates successfully
+LOGIN-058,[LOGIN] Verify old password after password reset,Negative,High,Password has been reset,Login using old password,Old password,Old password is rejected
+LOGIN-059,[LOGIN] Verify password with Unicode characters,Negative,Medium,Login page loaded,Enter Unicode password,Unicode password,Behavior follows supported password policy
+LOGIN-060,[LOGIN] Verify password with leading/trailing spaces,Negative,Medium,Login page loaded,Enter password with leading/trailing spaces,  password  ,Behavior matches password policy
+LOGIN-061,[LOGIN] Verify login with valid registered email and password,Positive,Critical,Active Wingify account exists,"Enter valid email, enter valid password, click Sign In",valid_registered_email; valid_password,User is authenticated successfully
+LOGIN-062,[LOGIN] Verify login with valid email and invalid password,Negative,Critical,Registered account exists,"Enter valid email and incorrect password, click Sign In",valid email; incorrect password,User is not authenticated and appropriate error is shown
+LOGIN-063,[LOGIN] Verify login with invalid email and valid password,Negative,High,Login page loaded,"Enter invalid email and valid password, click Sign In",invalid email; valid password,Authentication fails
+LOGIN-064,[LOGIN] Verify login with invalid email and invalid password,Negative,High,Login page loaded,"Enter invalid email and invalid password, click Sign In",invalid email; invalid password,Authentication fails
+LOGIN-065,[LOGIN] Verify login with both credentials blank,Negative,High,Login page loaded,Leave both fields blank and click Sign In,Blank email; blank password,Login is prevented
+LOGIN-066,[LOGIN] Verify valid email with blank password,Negative,High,Login page loaded,Enter valid email and leave password blank,Valid email; blank password,Login is prevented
+LOGIN-067,[LOGIN] Verify blank email with valid password,Negative,High,Login page loaded,Leave email blank and enter valid password,Blank email; valid password,Login is prevented
+LOGIN-068,[LOGIN] Verify unregistered email with valid password,Negative,High,Login page loaded,Enter unregistered email and valid password,Unregistered email; valid password,Authentication is rejected
+LOGIN-069,[LOGIN] Verify registered email with expired password,Negative,High,Account has expired password,Submit expired password,Registered email; expired password,Authentication is rejected or password-change flow appears
+LOGIN-070,[LOGIN] Verify disabled user cannot login,Negative,Critical,Disabled account exists,Login using disabled account credentials,Disabled user credentials,Access is denied
+LOGIN-071,[LOGIN] Verify locked user cannot login,Negative,Critical,Locked account exists,Login using locked account credentials,Locked user credentials,Access is denied
+LOGIN-072,[LOGIN] Verify login after session expiry,Positive,High,Previous session has expired,Return to login and authenticate again,Valid credentials,User can authenticate again
+LOGIN-073,[LOGIN] Verify login after browser refresh,Positive,Medium,Login page loaded,"Refresh page, enter valid credentials and login",Valid credentials,Login works normally
+LOGIN-074,[LOGIN] Verify login page in new browser tab,Positive,Medium,Login URL available,Open login URL in new tab,Valid URL,Login page works correctly
+LOGIN-075,[LOGIN] Verify Enter key submits login,Positive,High,Valid credentials entered,Press Enter after entering credentials,Valid credentials,Login form is submitted
+LOGIN-076,[LOGIN] Verify login without Remember Me,Positive,High,Active account exists,Enter valid credentials with Remember Me unchecked,Valid credentials,User logs in normally
+LOGIN-077,[LOGIN] Verify login with Remember Me selected,Positive,High,Active account exists,Select Remember Me and login,Valid credentials,Session persistence follows configured behavior
+LOGIN-078,[LOGIN] Verify Remember Me can be selected and deselected,Positive,Medium,Login page loaded,Click Remember Me checkbox twice,N/A,Checkbox toggles correctly
+LOGIN-079,[LOGIN] Verify browser close after Remember Me login,Positive,High,User logged in with Remember Me,Close browser and reopen,Valid credentials; Remember Me selected,Session behavior matches configured persistence
+LOGIN-080,[LOGIN] Verify session persistence after browser reopen,Positive,High,Remember Me session exists,Reopen browser and access application,Remember Me selected,User remains authenticated if session is valid
+LOGIN-081,[LOGIN] Verify session behavior without Remember Me,Positive,Medium,User logged in without Remember Me,Close and reopen browser,Remember Me unchecked,User authentication behavior matches configured session policy
+LOGIN-082,[LOGIN] Verify session timeout after inactivity,Positive,Critical,User logged in,Remain inactive until configured timeout,Active session,Session expires according to configured timeout
+LOGIN-083,[LOGIN] Verify protected page after session expiry,Negative,High,Session expired,Attempt to access protected page,Expired session,User is redirected to login
+LOGIN-084,[LOGIN] Verify logout after Remember Me login,Positive,Critical,User logged in with Remember Me,Click Logout,Active session,Session is terminated
+LOGIN-085,[LOGIN] Verify browser Back after logout,Negative,High,User has logged out,Press browser Back and attempt protected navigation,Logged-out session,Protected content is not accessible
+LOGIN-086,[LOGIN] Verify Forgot Password navigation,Positive,High,Login page loaded,Click Forgot Password,N/A,Password reset flow opens
+LOGIN-087,[LOGIN] Verify password reset with registered email,Positive,Critical,Registered account exists,"Click Forgot Password, enter registered email and submit",Registered email,Password reset email is generated
+LOGIN-088,[LOGIN] Verify password reset with unregistered email,Negative,High,Login page loaded,Submit password reset request using unregistered email,Unregistered email,Appropriate response is displayed
+LOGIN-089,[LOGIN] Verify password reset with blank email,Negative,High,Forgot Password page loaded,Leave email blank and submit,Blank email,Validation is displayed
+LOGIN-090,[LOGIN] Verify password reset with invalid email format,Negative,High,Forgot Password page loaded,Enter malformed email and submit,invalid-email,Email validation is displayed
+LOGIN-091,[LOGIN] Verify valid password reset link,Positive,Critical,Password reset email received,Open valid reset link,Valid reset token,Password reset page opens
+LOGIN-092,[LOGIN] Verify expired password reset link,Negative,Critical,Expired reset link available,Open expired reset link,Expired token,Expired-link error/recovery option is displayed
+LOGIN-093,[LOGIN] Verify Google login with valid account,Positive,High,Authorized Google account available,Select Google Sign-In and complete authentication,Valid Google account,User successfully authenticates
+LOGIN-094,[LOGIN] Verify Google login with unauthorized account,Negative,High,Unauthorized Google account available,Select Google Sign-In and authenticate,Unauthorized Google account,Access is rejected
+LOGIN-095,[LOGIN] Verify SSO navigation,Positive,High,SSO is configured,Click SSO login option,Configured SSO,User is redirected to configured identity provider
+LOGIN-096,[LOGIN] Verify valid SSO authentication,Positive,Critical,Valid SSO account exists,Complete SSO authentication,Valid SSO credentials,User successfully authenticates
+LOGIN-097,[LOGIN] Verify invalid SSO authentication,Negative,Critical,SSO configured,Attempt authentication with invalid SSO credentials,Invalid SSO credentials,Authentication fails
+LOGIN-098,[LOGIN] Verify unauthorized SSO user,Negative,Critical,SSO configured; unauthorized user exists,Authenticate through SSO as unauthorized user,Unauthorized SSO account,Access is denied
+LOGIN-099,[LOGIN] Verify valid Passkey authentication,Positive,High,Registered passkey available,Select Passkey and complete authentication,Registered passkey,User successfully authenticates
+LOGIN-100,[LOGIN] Verify cancelled or invalid Passkey authentication,Negative,High,Passkey option available,Start Passkey authentication and cancel/fail it,Cancelled/invalid passkey,Authentication fails and user remains in login flow
