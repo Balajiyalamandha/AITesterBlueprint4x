@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from './engine.js';
+import { api, detectMode, setModelProgress } from './engine.js';
 
 const MODES = [
   ['hybrid', 'Hybrid · RRF'],
@@ -64,7 +64,7 @@ function SourceBadge({ type, label, color }) {
 
 /* ------------------------------------------------------------------ Corpus */
 
-function Corpus({ health, sources, ingest, onIndex, busy, err }) {
+function Corpus({ health, sources, ingest, onIndex, busy, err, mode }) {
   const [size, setSize] = useState(150);
   const [overlap, setOverlap] = useState(30);
   const [open, setOpen] = useState(null);
@@ -97,9 +97,9 @@ function Corpus({ health, sources, ingest, onIndex, busy, err }) {
 
       <div className="pipe">
         {[
-          ['Chunk', 'per source kind'],
-          ['Embed', `${health?.embed_model || 'ollama'} · Ollama`],
-          ['Store', 'Qdrant · local'],
+          ['Chunk', mode === 'static' ? 'per source kind · baked' : 'per source kind'],
+          ['Embed', mode === 'static' ? 'MiniLM · 384d · browser' : `${health?.embed_model || 'ollama'} · Ollama`],
+          ['Store', mode === 'static' ? 'JSON · cosine in JS' : 'Qdrant · local'],
           ['Index', 'dense + BM25'],
           ['Ask', `${health?.llm_model || 'llm'} · Groq`],
         ].map(([b, s], i, a) => (
@@ -136,11 +136,17 @@ function Corpus({ health, sources, ingest, onIndex, busy, err }) {
             <div className="stat"><div className="n">{r.chunk_count}</div><div className="l">chunks</div></div>
             <div className="stat"><div className="n">{r.dims}</div><div className="l">dimensions</div></div>
             <div className="stat"><div className="n" style={{ fontSize: 14 }}>{r.model}</div><div className="l">embed model</div></div>
-            <div className="stat"><div className="n">{r.timings?.embed_ms}<small style={{ fontSize: 12 }}>ms</small></div><div className="l">embed time</div></div>
+            <div className="stat">
+              {mode === 'static'
+                ? <><div className="n" style={{ fontSize: 15 }}>pre-built</div><div className="l">vectors</div></>
+                : <><div className="n">{r.timings?.embed_ms}<small style={{ fontSize: 12 }}>ms</small></div><div className="l">embed time</div></>}
+            </div>
           </div>
           <div className="note">
-            Chunked and embedded entirely on this machine in {r.timings?.total_ms} ms. Model pick:{' '}
-            <b>{r.model}</b> — {r.model_reason}.
+            {mode === 'static'
+              ? <>These chunks were <b>pre-computed at build time</b>. Model: <b>{r.model}</b> — {r.model_reason}.</>
+              : <>Chunked and embedded entirely on this machine in {r.timings?.total_ms} ms. Model pick:{' '}
+                <b>{r.model}</b> — {r.model_reason}.</>}
           </div>
           {r.errors?.length > 0 && (
             <div className="err" style={{ marginTop: 11 }}>{r.errors.join(' · ')}</div>
@@ -397,6 +403,8 @@ export default function App() {
   const [ingest, setIngest] = useState(null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState(null);
+  const [mode, setMode] = useState(null);
+  const [dl, setDl] = useState(null);
 
   async function refresh() {
     try {
@@ -408,7 +416,13 @@ export default function App() {
     }
   }
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    setModelProgress((pct) => setDl(pct >= 100 ? null : pct));
+    detectMode().then(({ mode: m }) => {
+      setMode(m);
+      refresh();
+    });
+  }, []);
 
   async function onIndex(size, overlap) {
     setBusy(true); setErr(null);
@@ -432,12 +446,23 @@ export default function App() {
           <div className="logo">🧭</div>
           <div><h1>QABuddyAI</h1><p>Multi-source retrieval for QA · local first</p></div>
           <div className="pills">
-            <span className={`pill ${health?.ollama ? 'ok' : 'no'}`}>
-              ● {health?.embed_model || 'ollama'}
-            </span>
-            <span className="pill">qdrant · {health?.chunks ?? 0} chunks</span>
-            <span className="pill">{health?.sources ?? 12} sources</span>
-            <span className={`pill ${health?.groq_key_loaded ? 'ok' : 'no'}`}>● {health?.llm_model || 'llm'}</span>
+            {mode === 'static' ? (
+              <>
+                <span className="pill ok">● MiniLM · 384d · in-browser</span>
+                <span className="pill">json · {health?.chunks ?? 0} chunks</span>
+                <span className="pill">{health?.sources ?? 12} sources</span>
+                <span className="pill ok">● {health?.llm_model || 'llm'} · Groq</span>
+              </>
+            ) : (
+              <>
+                <span className={`pill ${health?.ollama ? 'ok' : 'no'}`}>
+                  ● {health?.embed_model || 'ollama'}
+                </span>
+                <span className="pill">qdrant · {health?.chunks ?? 0} chunks</span>
+                <span className="pill">{health?.sources ?? 12} sources</span>
+                <span className={`pill ${health?.groq_key_loaded ? 'ok' : 'no'}`}>● {health?.llm_model || 'llm'}</span>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -447,14 +472,29 @@ export default function App() {
             <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{label}</button>
           ))}
         </nav>
-        <div className="note" style={{ marginTop: -6, marginBottom: 18 }}>
-          <b>Local by default.</b> Documents are read, chunked, embedded and indexed on this
-          machine — Qdrant runs in-process from a folder, Ollama serves the embeddings at{' '}
-          {health?.embed_model_reason || 'auto-picked'}. Only the retrieved chunks reach Groq,
-          and only on the Chat tab.
-        </div>
+        {mode === 'static' ? (
+          <div className="note" style={{ marginTop: -6, marginBottom: 18 }}>
+            <b>Hosted demo.</b> Chunk vectors were pre-computed at build time, and your query
+            is embedded in your browser with MiniLM (384d, ~23MB, downloaded once). Dense
+            cosine, BM25 and RRF are recomputed here in JavaScript. Only the answer leaves the
+            browser, through a proxy that keeps the Groq key server-side. Run it locally and
+            the same UI switches to the full pipeline: Ollama embeddings and a local Qdrant.
+          </div>
+        ) : (
+          <div className="note" style={{ marginTop: -6, marginBottom: 18 }}>
+            <b>Local by default.</b> Documents are read, chunked, embedded and indexed on this
+            machine — Qdrant runs in-process from a folder, Ollama serves the embeddings at{' '}
+            {health?.embed_model_reason || 'auto-picked'}. Only the retrieved chunks reach Groq,
+            and only on the Chat tab.
+          </div>
+        )}
+        {dl !== null && (
+          <div className="note" style={{ marginTop: -6, marginBottom: 18 }}>
+            Downloading the embedding model… {dl}%
+          </div>
+        )}
         {tab === 'corpus' && (
-          <Corpus health={health} sources={sources} ingest={ingest} onIndex={onIndex} busy={busy} err={err} />
+          <Corpus health={health} sources={sources} ingest={ingest} onIndex={onIndex} busy={busy} err={err} mode={mode} />
         )}
         {tab === 'search' && <Search ready={!!health?.indexed} sources={sources} />}
         {tab === 'chat' && <Chat ready={!!health?.indexed} sources={sources} />}
